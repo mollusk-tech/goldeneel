@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      - DB_DSN=postgres://postgres:postgres@db:5432/messaging?sslmode=disable
+      - JWT_SECRET=change-me-in-prod
+      - DATA_DIR=/data
+      - ENABLE_TLS=false
+      - HTTP_PORT=8081
+      - HTTPS_PORT=8443
+      - GIN_MODE=release
+    volumes:
+      - app_data:/data
+    depends_on:
+      - db
+    ports:
+      - "8081"
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=messaging
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  app_data:
